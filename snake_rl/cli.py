@@ -138,5 +138,36 @@ def dashboard(
     raise SystemExit(subprocess.call(cmd))
 
 
+@app.command("export-web")
+def export_web(
+    weights: Annotated[Path, typer.Option("--weights", "-w")] = Path("models/snake_dqn.npz"),
+    out_dir: Annotated[Path, typer.Option("--out-dir")] = Path("web/public"),
+    data_dir: Annotated[Path, typer.Option("--data-dir")] = Path("data"),
+    skip_curve: Annotated[bool, typer.Option("--skip-curve")] = False,
+) -> None:
+    """Exporta model.json (+ learning_curve.json) para o front-end estático."""
+    from snake_rl.export_web import (
+        export_learning_curve_json,
+        export_model_json,
+        export_parity_fixture,
+    )
+
+    if not weights.exists():
+        typer.echo(f"Pesos não encontrados: {weights}", err=True)
+        raise typer.Exit(code=1)
+
+    model_path = export_model_json(weights, out_dir / "model.json")
+    fixture_path = export_parity_fixture(weights, out_dir / "parity_fixture.json")
+    typer.echo(f"modelo → {model_path}")
+    typer.echo(f"fixture → {fixture_path}")
+
+    if not skip_curve:
+        curve = export_learning_curve_json(data_dir, out_dir / "learning_curve.json")
+        if curve is None:
+            typer.echo("learning_curve.json: sem dados DuckDB (rode `snake train` antes)")
+        else:
+            typer.echo(f"curva → {curve}")
+
+
 if __name__ == "__main__":
     app()

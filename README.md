@@ -4,6 +4,30 @@
 
 Uma rede neural escrita **só com NumPy** (sem PyTorch/TensorFlow) que aprende a jogar Snake com **Q-learning**. Cada episódio de treino vira dado de verdade: Parquet particionado, DuckDB e um dashboard Streamlit para analisar a curva de aprendizado.
 
+## Demo interativa
+
+A vitrine principal é o front-end em `web/`: Snake ao vivo no canvas + visualização da rede (11 → 64 → 3) a cada passo.
+
+- **Link (placeholder — atualizar após o deploy na Vercel):** [https://snake-ericguerrize.vercel.app](https://snake-ericguerrize.vercel.app)
+- Screenshot da UI:
+
+![Demo interativa no navegador](docs/web_demo.png)
+
+### Como publicar na Vercel
+
+1. Importe o repositório em [vercel.com/new](https://vercel.com/new).
+2. Defina **Root Directory** = `web` (o `web/vercel.json` já aponta `buildCommand` / `outputDirectory` / framework Vite).
+3. Deploy. Atualize o link acima com a URL real do projeto.
+
+Localmente:
+
+```bash
+snake export-web          # models/*.npz → web/public/model.json (+ curva)
+cd web && npm install && npm run dev
+```
+
+Fallback (GIF do agente guloso):
+
 ![Agente treinado jogando Snake](docs/snake_play.gif)
 
 ---
@@ -130,6 +154,9 @@ snake play --weights models/snake_dqn.npz --render
 # Exportar GIF do agente guloso
 snake gif --weights models/snake_dqn.npz --out docs/snake_play.gif
 
+# Exportar pesos/curva para o front-end web
+snake export-web
+
 # Relatório SQL
 snake report
 
@@ -137,7 +164,7 @@ snake report
 snake dashboard
 ```
 
-Atalhos: `make install-dev`, `make test`, `make lint`, `make train`, `make gif`.
+Atalhos: `make install-dev`, `make test`, `make lint`, `make train`, `make gif`, `make export-web`, `make web-build`.
 
 ---
 
@@ -177,9 +204,11 @@ snake_rl/
   logging_de.py   # Parquet particionado + DuckDB
   analysis.py     # Consultas SQL
   render.py       # ASCII, GIF, PNG da curva
-  cli.py          # Typer: train | play | gif | report | dashboard
+  export_web.py   # NPZ → model.json / learning_curve.json
+  cli.py          # Typer: train | play | gif | report | dashboard | export-web
   dashboard.py    # Streamlit
-tests/            # env, features, gradiente numérico, smoke train
+web/              # Demo Vite (canvas + viz da rede) → deploy Vercel
+tests/            # env, features, gradiente numérico, smoke train, export
 ```
 
 ---

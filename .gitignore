@@ -26,3 +26,7 @@ data/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Web (Vite)
+web/node_modules/
+web/dist/
