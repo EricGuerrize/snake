@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Snake RL — demo interativa</title>
+    <meta
+      name="description"
+      content="Rede neural NumPy (11→64→3) jogando Snake no navegador, com visualização ao vivo dos neurônios."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="score">score <span id="score">0</span></div>
+      <div class="arch">11 &gt; 64 &gt; 3, NumPy only</div>
+    </header>
+
+    <main class="stage">
+      <section class="panel" aria-label="Jogo Snake">
+        <canvas id="gameCanvas"></canvas>
+      </section>
+      <section class="panel" aria-label="Visualização da rede neural">
+        <canvas id="netCanvas"></canvas>
+      </section>
+    </main>
+
+    <div class="controls">
+      <button type="button" class="primary" id="btnNew">Nova partida</button>
+      <button type="button" id="btnPlay" class="active">Pausar</button>
+      <button type="button" id="btnStep">Passo</button>
+      <label class="slider-wrap">
+        Velocidade
+        <input id="speed" type="range" min="1" max="30" value="10" />
+        <span id="speedLabel">10×</span>
+      </label>
+      <button type="button" id="btnMode" class="active" title="Alterna agente treinado / aleatório">
+        Agente treinado
+      </button>
+      <button type="button" id="btnTrain" title="Treina uma rede fresca no navegador">
+        Treinar no navegador
+      </button>
+      <div class="meta">
+        <span>melhor sessão: <strong id="best">0</strong></span>
+        <span>seed: <strong id="seedLabel">0</strong></span>
+        <span id="statusLabel">pronto</span>
+      </div>
+    </div>
+
+    <section class="curve-section" id="curveSection" hidden>
+      <h2>Curva de aprendizado (treino offline)</h2>
+      <p id="curveCaption">Scores exportados do DuckDB via <code>snake export-web</code>.</p>
+      <canvas id="curveCanvas" width="1000" height="180"></canvas>
+    </section>
+
+    <p class="footer">
+      Eric Guerrize · Q-learning em NumPy ·
+      <a href="https://github.com/EricGuerrize/snake">código no GitHub</a>
+    </p>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
