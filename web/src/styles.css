@@ -32,9 +32,57 @@ body {
 .topbar {
   display: flex;
   justify-content: space-between;
-  align-items: baseline;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 12px;
+}
+
+.brand-stats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.kpi-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pill {
+  background: #12121a;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 4px 11px;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.pill strong {
+  color: var(--text);
+  font-family: var(--mono);
+}
+
+.mode-group {
+  display: inline-flex;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: #101018;
+}
+
+.mode-group button {
+  border: none;
+  border-right: 1px solid var(--border);
+  border-radius: 0;
+  padding: 8px 11px;
+  font-size: 0.88rem;
+}
+
+.mode-group button:last-child {
+  border-right: none;
 }
 
 .score {

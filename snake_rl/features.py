@@ -58,9 +58,10 @@ def extract_state(env: SnakeEnv) -> np.ndarray:
     for i, action in enumerate((ACTION_STRAIGHT, ACTION_RIGHT, ACTION_LEFT)):
         nxt_dir = SnakeEnv.turn(direction, action)
         nxt_pos = SnakeEnv.next_cell(head, nxt_dir)
-        # Para checagem de perigo, consideramos o corpo atual (sem mover a cauda),
-        # alinhado à percepção "há obstáculo imediatamente à frente?".
-        state[i] = 1.0 if env.is_collision(nxt_pos) else 0.0
+        # Se não comer, a ponta da cauda libera a célula neste passo (mesma regra de env.step).
+        will_eat = nxt_pos == env.food
+        body_to_check = env.snake if will_eat else env.snake[:-1]
+        state[i] = 1.0 if env.is_collision(nxt_pos, body_to_check) else 0.0
 
     # Direção atual (one-hot).
     state[DIR_RIGHT] = 1.0 if direction == Direction.RIGHT else 0.0

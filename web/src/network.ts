@@ -136,6 +136,118 @@ export class MLPQNetwork {
       output_size: this.outputSize,
     });
   }
+
+  copyWeightsFrom(other: MLPQNetwork): void {
+    for (let i = 0; i < this.inputSize; i++) {
+      for (let j = 0; j < this.hiddenSize; j++) {
+        this.W1[i][j] = other.W1[i][j];
+      }
+    }
+    for (let j = 0; j < this.hiddenSize; j++) {
+      this.b1[j] = other.b1[j];
+      for (let k = 0; k < this.outputSize; k++) {
+        this.W2[j][k] = other.W2[j][k];
+      }
+    }
+    for (let k = 0; k < this.outputSize; k++) {
+      this.b2[k] = other.b2[k];
+    }
+  }
+
+  /** Passo SGD MSE em mini-batch (espelha MLPQNetwork.backward do Python). */
+  trainBatch(
+    states: Float64Array[],
+    actions: Int32Array | number[],
+    targets: Float64Array | number[],
+    lr: number,
+  ): number {
+    const batch = states.length;
+    if (batch === 0) return 0;
+
+    const dW1 = Array.from({ length: this.inputSize }, () => new Float64Array(this.hiddenSize));
+    const db1 = new Float64Array(this.hiddenSize);
+    const dW2 = Array.from({ length: this.hiddenSize }, () => new Float64Array(this.outputSize));
+    const db2 = new Float64Array(this.outputSize);
+
+    let totalLoss = 0;
+    const scale = 2.0 / batch;
+
+    for (let b = 0; b < batch; b++) {
+      const x = states[b];
+      const act = actions[b];
+      const target = targets[b];
+      const { q, h } = this.forward(x);
+      const residual = q[act] - target;
+      totalLoss += residual * residual;
+      const dqAct = scale * residual;
+
+      db2[act] += dqAct;
+      for (let j = 0; j < this.hiddenSize; j++) {
+        dW2[j][act] += h[j] * dqAct;
+        if (h[j] > 0) {
+          const dh = dqAct * this.W2[j][act];
+          db1[j] += dh;
+          for (let i = 0; i < this.inputSize; i++) {
+            if (x[i] !== 0) dW1[i][j] += x[i] * dh;
+          }
+        }
+      }
+    }
+
+    for (let j = 0; j < this.hiddenSize; j++) {
+      this.b1[j] -= lr * db1[j];
+      for (let k = 0; k < this.outputSize; k++) {
+        this.W2[j][k] -= lr * dW2[j][k];
+      }
+    }
+    for (let i = 0; i < this.inputSize; i++) {
+      for (let j = 0; j < this.hiddenSize; j++) {
+        this.W1[i][j] -= lr * dW1[i][j];
+      }
+    }
+
+    return totalLoss / batch;
+  }
+}
+
+export type Transition = {
+  state: Float64Array;
+  action: number;
+  reward: number;
+  nextState: Float64Array;
+  done: boolean;
+};
+
+export class ReplayBuffer {
+  private buf: Transition[] = [];
+  private pos = 0;
+  readonly capacity: number;
+
+  constructor(capacity = 15_000) {
+    this.capacity = capacity;
+  }
+
+  get length(): number {
+    return this.buf.length;
+  }
+
+  push(t: Transition): void {
+    if (this.buf.length < this.capacity) {
+      this.buf.push(t);
+    } else {
+      this.buf[this.pos] = t;
+    }
+    this.pos = (this.pos + 1) % this.capacity;
+  }
+
+  sample(batchSize: number, rng: () => number = Math.random): Transition[] {
+    const n = this.buf.length;
+    const out: Transition[] = [];
+    for (let i = 0; i < batchSize; i++) {
+      out.push(this.buf[Math.floor(rng() * n)]);
+    }
+    return out;
+  }
 }
 
 export async function loadModel(url = "./model.json"): Promise<MLPQNetwork> {

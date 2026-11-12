@@ -79,3 +79,14 @@ def test_food_same_cell_flags_zero() -> None:
     assert state[FOOD_RIGHT] == 0.0
     assert state[FOOD_UP] == 0.0
     assert state[FOOD_DOWN] == 0.0
+
+
+def test_tail_tip_not_flagged_as_danger_when_not_eating() -> None:
+    """A ponta da cauda sai da célula ao avançar sem comer; não deve ser marcada como perigo."""
+    env = SnakeEnv(grid_size=10, seed=0)
+    # Quadrado 2x2: cabeça em (5,5) indo para UP -> célula acima (5,4) é a ponta da cauda.
+    env.snake = [(5, 5), (4, 5), (4, 4), (5, 4)]
+    env.direction = Direction.UP
+    env.food = (0, 0)
+    state = extract_state(env)
+    assert state[DANGER_STRAIGHT] == 0.0

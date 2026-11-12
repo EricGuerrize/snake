@@ -121,13 +121,13 @@ class TrainingLogger:
             con.execute(
                 f"""
                 CREATE OR REPLACE TABLE {EPISODES_TABLE} AS
-                SELECT * FROM read_parquet('{ep_glob}', hive_partitioning=true)
+                SELECT * FROM read_parquet('{ep_glob}', hive_partitioning=true, union_by_name=true)
                 """
             )
             con.execute(
                 f"""
                 CREATE OR REPLACE TABLE {RUNS_TABLE} AS
-                SELECT * FROM read_parquet('{run_glob}', hive_partitioning=true)
+                SELECT * FROM read_parquet('{run_glob}', hive_partitioning=true, union_by_name=true)
                 """
             )
         finally:

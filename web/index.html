@@ -17,8 +17,15 @@
   </head>
   <body>
     <header class="topbar">
-      <div class="score">score <span id="score">0</span></div>
-      <div class="arch">11 &gt; 64 &gt; 3, NumPy only</div>
+      <div class="brand-stats">
+        <div class="score">score <span id="score">0</span></div>
+        <div class="kpi-pills">
+          <span class="pill">melhor: <strong id="best">0</strong></span>
+          <span class="pill">média: <strong id="avgScore">0.0</strong></span>
+          <span class="pill">partidas: <strong id="gamesCount">0</strong></span>
+        </div>
+      </div>
+      <div class="arch">11 → 64 (ReLU) → 3 · NumPy DQN</div>
     </header>
 
     <main class="stage">
@@ -39,14 +46,24 @@
         <input id="speed" type="range" min="1" max="30" value="10" />
         <span id="speedLabel">10×</span>
       </label>
-      <button type="button" id="btnMode" class="active" title="Alterna agente treinado / aleatório">
-        Agente treinado
+      <div class="mode-group" role="group" aria-label="Modo de controle">
+        <button type="button" id="btnModeTrained" class="active" title="Rede treinada em Python (NumPy)">
+          IA Treinada
+        </button>
+        <button type="button" id="btnModeHuman" title="Jogue nas setas ou WASD enquanto vê a rede calcular Q(s,a)">
+          Jogar (WASD/Setas)
+        </button>
+        <button type="button" id="btnModeRandom" title="Pesos aleatórios não treinados">
+          IA Aleatória
+        </button>
+      </div>
+      <button type="button" id="btnAutoRestart" class="active" title="Reinicia automaticamente ao bater">
+        Auto-reiniciar: ON
       </button>
-      <button type="button" id="btnTrain" title="Treina uma rede fresca no navegador">
+      <button type="button" id="btnTrain" title="Treina uma rede com Replay Buffer + Target Net direto no navegador">
         Treinar no navegador
       </button>
       <div class="meta">
-        <span>melhor sessão: <strong id="best">0</strong></span>
         <span>seed: <strong id="seedLabel">0</strong></span>
         <span id="statusLabel">pronto</span>
       </div>

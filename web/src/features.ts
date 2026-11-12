@@ -34,7 +34,9 @@ export function extractState(env: SnakeEnv): Float64Array {
   for (let i = 0; i < 3; i++) {
     const nxtDir = SnakeEnv.turn(direction, actions[i]);
     const nxtPos = SnakeEnv.nextCell(head, nxtDir);
-    state[i] = env.isCollision(nxtPos) ? 1 : 0;
+    const willEat = nxtPos.x === env.food.x && nxtPos.y === env.food.y;
+    const bodyToCheck = willEat ? env.snake : env.snake.slice(0, -1);
+    state[i] = env.isCollision(nxtPos, bodyToCheck) ? 1 : 0;
   }
 
   state[3] = direction === DIR.RIGHT ? 1 : 0;
